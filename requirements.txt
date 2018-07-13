@@ -1,0 +1,2 @@
+flask.__version__ = 1.0.2
+sqlalchemy.__version__ = 1.2.8
