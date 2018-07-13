@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 import os
 import sys
 from sqlalchemy import Column, ForeignKey, Integer, String
@@ -62,6 +64,10 @@ engine = create_engine('sqlite:///propertyInsurance.db')
 
 # create a new insurance type
 def createType(jsonObj):
+    """
+    Create a new Insurance type
+    data: {"type":"health"}
+    """
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -103,6 +109,9 @@ def createType(jsonObj):
 
 # get all insurance types
 def getTypes():
+    """
+    Getting all Insurance Types    
+    """
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -128,6 +137,10 @@ def getTypes():
 
 # add an attribute to an insurance type
 def addAttribute(insuranceType, jsonObj):
+    """
+    Create Attributes to new Insurance Type
+    Data: {"name":"fullName", "dataType":"String", "mandatory":"Yes"}    
+    """
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -194,6 +207,9 @@ def addAttribute(insuranceType, jsonObj):
 
 # get all attributes of an insurance type
 def getAttributes(insuranceType):
+    """
+    Get all Attributes of Insurance Type
+    """
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -230,6 +246,10 @@ def getAttributes(insuranceType):
 
 # add an insured to an the data base
 def addInsured(insuranceType, jsonObj):
+    """
+    Add Insured for Insurance Type, 
+    data: {"attributes":[{"attributeName":"fullName", "attributeValue":"value of attribute"}]}
+    """
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -301,8 +321,7 @@ def addInsured(insuranceType, jsonObj):
                 value = int(attr["attributeValue"])
             except ValueError:
                 return json.dumps({"status":"error", "message":"Invalid request"})
-        elif iattr.dataType=="enum":
-            # TODO check for valid enum value, throw error if not valid
+        elif iattr.dataType=="enum"
             value = attr["attributeValue"]
         elif iattr.dataType=="string":
             value = attr["attributeValue"]
@@ -327,6 +346,10 @@ def addInsured(insuranceType, jsonObj):
 
 # getone insured detials
 def getOneInsured(insuranceType, insuredID):
+    """
+    Get One Insured details to an Insurance Type
+    """
+    
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -364,7 +387,10 @@ def getOneInsured(insuranceType, insuredID):
 
 
 def getAllInsured(insuranceType):
-    print 'get request for all Insured ID\'s for insurance type', insuranceType
+    """
+    Get All Insured for an insurance type
+    """
+    
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -393,6 +419,10 @@ def getAllInsured(insuranceType):
 
 
 def updateInsured(insuranceType, insuredID, jsonObj):
+    """
+    Update attribute value of insured to an insurance type
+    data: {"attributes":{"attributeName":"fullName", "attributeValue":"fullname1_modified"}}
+    """
     Base.metadata.bind = engine
     DBSession = sessionmaker()
     session = DBSession()
@@ -501,9 +531,10 @@ def updateInsured(insuranceType, insuredID, jsonObj):
 
 
 def deleteInsured(insuranceType, insuredID):
-    print 'delete request to delete insured'
-    print 'insuranceType=',insuranceType
-    print 'insuredID=',insuredID
+    """
+    Delete Insured to an Insurance Type
+    """
+    
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -538,7 +569,9 @@ def deleteInsured(insuranceType, insuredID):
 
 
 def deleteType(insuranceType):
-    print 'insuranceType=',insuranceType
+    """
+    Delete Insurance Type
+    """
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -575,6 +608,9 @@ def deleteType(insuranceType):
 
 
 def deleteAttribute(insuranceType, jsonObj):
+    """
+    Delete Attribute of Insurance Type
+    """
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
