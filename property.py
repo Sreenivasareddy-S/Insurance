@@ -1,22 +1,14 @@
-#!/usr/bin/env python2
-
-import os
-import sys
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
-import socket
 import json
 from sqlalchemy import and_
 from sqlalchemy import or_
 
 from flask import Flask
-from flask import jsonify
 from flask import request
-from flask import abort, Response
 from collections import OrderedDict
 
 
@@ -84,7 +76,6 @@ def createType(jsonObj):
     try:
         insurance = session.query(Insurance).filter(Insurance.type == jsonObj["type"]).all()
     except exc.SQLAlchemyError as e:
-        print e
         return json.dumps({"status":"error", "message":"DB error"})
 
     if len(insurance):
@@ -176,12 +167,10 @@ def addAttribute(insuranceType, jsonObj):
     # check for attribute name lenght exceeds 255 and return proper error
     attribute.name = jsonObj["name"]
     if len(attribute.name) > 255:
-        print "length of name"
         return json.dumps({"status":"error", "message":"Invalid request"}), 400
 
     # check if the given data type matches with one of the dataTypes, like 'int', string'
     if jsonObj["dataType"] not in DataTypes.keys():
-        print "dataType exist in keys"
         return json.dumps({"status":"failed", "message":"Invalid request"}), 400
 
     # check for optional value should be yes or no
@@ -196,7 +185,6 @@ def addAttribute(insuranceType, jsonObj):
         session.add(attribute)
         session.commit()
     except exc.SQLAlchemyError as e:
-        print 'Error: ',e
         session.rollback()
         return json.dumps({"status":"error", "message":"DB error"})
     finally:
@@ -225,11 +213,9 @@ def getAttributes(insuranceType):
         insurance_attributes = session.query(InsuranceAttribute) \
                             .filter(InsuranceAttribute.insuranceID == insurance.id).all()
     except exc.SQLAlchemyError as e:
-        print "Error: ",e
         return json.dumps({"status":"error", "message": "DB error"})
 
     attributes = []
-    # TODO handle maximum number of attributes that can be handled to be the configured by the user.
     for insurance_attribute in insurance_attributes:
         attribute = OrderedDict([("name", insurance_attribute.name), \
                     ("dataType", insurance_attribute.dataType), \
@@ -312,7 +298,6 @@ def addInsured(insuranceType, jsonObj):
                     InsuranceAttribute.insuranceID == insurance.id, \
                     InsuranceAttribute.name == attr["attributeName"])).one()
         except exc.SQLAlchemyError as e:
-            print e
             return json.dumps({"status":"error", "message": attr["attributeName"] + " " +"Attribute not found"}), 404
 
         if iattr.dataType=="int":
@@ -321,7 +306,7 @@ def addInsured(insuranceType, jsonObj):
                 value = int(attr["attributeValue"])
             except ValueError:
                 return json.dumps({"status":"error", "message":"Invalid request"})
-        elif iattr.dataType=="enum"
+        elif iattr.dataType=="enum":
             value = attr["attributeValue"]
         elif iattr.dataType=="string":
             value = attr["attributeValue"]
@@ -499,12 +484,10 @@ def updateInsured(insuranceType, insuredID, jsonObj):
 
     # if attribute found in insured attributes
     if attribute["attributeName"] in insured_attributes:
-        print "insured attributes: ", insured_attributes
         # getting insured data
         try:
             iData = session.query(insuredData).filter(and_(insuredData.insuredID == insured.id, insuredData.name == attribute["attributeName"])).one()
         except exc.SQLAlchemyError as e:
-            print e
             return json.dumps({"status":"error", "message":"Attribute not found"}), 404
 
         try:
@@ -542,7 +525,6 @@ def deleteInsured(insuranceType, insuredID):
     try:
         insurance = session.query(Insurance).filter(Insurance.type == insuranceType).one()
     except exc.SQLAlchemyError as e:
-        print e
         return json.dumps({"status":"error", "message":"Insurance type not found"}), 404
 
     try:
@@ -580,7 +562,6 @@ def deleteType(insuranceType):
     try:
         insurance = session.query(Insurance).filter(Insurance.type == insuranceType).one()
     except exc.SQLAlchemyError as e:
-        print e
         return json.dumps({"status":"error", "message":"Insurance type not found"}), 404
 
     # check for weather any insured values for insurance type
@@ -667,9 +648,7 @@ def deleteAttribute(insuranceType, jsonObj):
 
 @app.route('/risk/<riskId>/deleteAttribute', methods=['POST'])
 def deleteRiskAttribute(riskId):
-    print dir(request)
     args = request.args
-    print args["attributeName"]
     jsonObj = json.loads(request.data)
     return deleteAttribute(riskId,jsonObj)
 
@@ -684,19 +663,16 @@ def getRiskAttributes(riskId):
 
 @app.route('/risk/<riskId>/addAttribute', methods=['POST'])
 def addRiskAttribute(riskId):
-    print 'Adding attribute to risk', riskId
     jsonObj = json.loads(request.data)
     return addAttribute(riskId, jsonObj)
 
 @app.route('/risk/<riskId>/addInsured', methods=['POST'])
 def addRiskInsured(riskId):
-    print 'Adding insured to risk', riskId
     jsonObj = json.loads(request.data)
     return addInsured(riskId, jsonObj)
 
 @app.route('/risk/<riskId>/get/<insuredID>', methods=['GET'])
 def getRiskInsured(riskId, insuredID):
-    print 'getting insured details', riskId
     return getOneInsured(riskId, insuredID)
 
 
@@ -716,7 +692,6 @@ def getAllRiskInsured(riskId):
 @app.route('/risk/<riskId>/update/<insuredID>', methods=['PUT'])
 def updateRiskInsured(riskId, insuredID):
     jsonObj = json.loads(request.data)
-    print 'updateRiskInsured=',jsonObj
     return updateInsured(riskId, insuredID, jsonObj)
 
 
