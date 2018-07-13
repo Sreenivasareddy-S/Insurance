@@ -1,2 +1,2 @@
-# A simple Insurance Policy project by using Flask and Sqlalchemy. 
+# A simple Insurance project by using Flask and Sqlalchemy. 
  
