@@ -138,6 +138,7 @@ def addAttribute(insuranceType, jsonObj):
 
     try:
         insurance = session.query(Insurance).filter(Insurance.type == insuranceType).one()
+        print("insurance object methods: ", dir(insurance))
     except exc.SQLAlchemyError as e:
         return json.dumps({"status":"error", "message":"Insurance Type not found"}), 404
 
